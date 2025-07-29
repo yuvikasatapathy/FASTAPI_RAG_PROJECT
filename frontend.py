@@ -12,8 +12,10 @@ if st.button("Submit"):
         )
         if response.status_code == 200:
             result = response.json()
+            st.write("**Answer:**")
+            st.success(result.get("answer", "no answer returned."))
             st.write("**Top Chunks (from DB):**")
-            for chunk in results.get("top_chunks", []):
+            for chunk in result.get("top_chunks", []):
                 st.write(f"-{chunk}")
         else:
             st.error("Error: Could not get answer from API")

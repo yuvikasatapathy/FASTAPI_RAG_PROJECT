@@ -55,7 +55,28 @@ def store_embeddings(data_chunks):
 
 store_embeddings(data_chunks)
 
-
+def search_similar_chunks(query_embedding, top_k=3):
+    conn = psycopg2.connect(
+        database="postgres",
+        user="postgres",
+        password=os.getenv("DB_PASSWORD"),
+        host="localhost",
+        port="5432"
+    )
+    cur = conn.cursor()
+    cur.execute(
+        """
+        SELECT text
+        FROM documents
+        ORDER BY embedding <-> %s::vector
+        LIMIT %s
+        """,
+        (query_embedding, top_k)
+    )
+    results = [row[0] for row in cur.fetchall()]
+    cur.close()
+    conn.close()
+    return results
 
 result = genai.embed_content(
     model = "models/embedding-001",
@@ -67,8 +88,16 @@ result = genai.embed_content(
     ],
     task_type = "retrieval_query",
 )
+def embed_query(query):
+    response = genai.embed_content(
+        model="models/embedding-001",
+        content=query,
+        task_type="retrieval_query"
+    )
+    return response["embedding"]
+
 print(result['embedding'])
-def select_relevant(query_embedding, top_k=3):
+def search_pgvector(query_embedding, top_k=3):
     conn=psycopg2.connect(
         database="postgres",
         user="postgres",
@@ -91,5 +120,5 @@ def select_relevant(query_embedding, top_k=3):
     conn.close()
     return results 
 query_embedding = result['embedding'][0] 
-results = select_relevant(query_embedding)#select one query embedding and store it in variable, will use this vector in sql query 
+results = search_pgvector(query_embedding)#select one query embedding and store it in variable, will use this vector in sql query 
 print(results)
