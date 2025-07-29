@@ -39,7 +39,7 @@ def store_embeddings(data_chunks):
     conn=psycopg2.connect(
         database="postgres",
         user="postgres",
-        password = "Birthdaygift8!",
+        password = "DB_PASSWORD",
         host="localhost",
         port="5432"
     )
@@ -72,7 +72,7 @@ def select_relevant(query_embedding, top_k=3):
     conn=psycopg2.connect(
         database="postgres",
         user="postgres",
-        password = "Birthdaygift8!",
+        password = "DB_PASSWORD",
         host="localhost",
         port="5432"
     )
