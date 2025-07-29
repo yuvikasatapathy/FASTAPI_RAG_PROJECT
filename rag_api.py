@@ -8,7 +8,7 @@ import google.generativeai as genai
 
 app = FastAPI()
 load_dotenv()
-genai.configure(api_key="AIzaSyDqU6ZEgbpyiRWV8QJuaGrujc61rmVs1Ag")
+genai.configure(api_key="GEMINI_API_KEY")
 
 def get_connection():
     return psycopg2.connect(
