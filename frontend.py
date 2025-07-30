@@ -17,6 +17,9 @@ if st.button("Submit"):
             st.write("**Top Chunks (from DB):**")
             for chunk in result.get("top_chunks", []):
                 st.write(f"-{chunk}")
+                st.markdown("---")  # adds a line break to force visual separation
+                st.write(response.json())  # TEMP: debug raw output
+
         else:
             st.error("Error: Could not get answer from API")
     else:

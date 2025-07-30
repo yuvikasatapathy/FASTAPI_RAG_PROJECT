@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("models/gemini-pro")
+model = genai.GenerativeModel("gemini-pro")
 
 def generate_answer_from_chunks(question, top_chunks):
     context = "\n\n".join(chunk[0] for chunk in top_chunks)
