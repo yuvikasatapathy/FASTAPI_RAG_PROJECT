@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, UploadFile, File 
 from pydantic import BaseModel 
+import time 
 import psycopg2 
 import os 
 from dotenv import load_dotenv
@@ -25,8 +26,10 @@ class Query(BaseModel):
 
 @app.post("/ask")
 def ask_question(query: Query):
+    start = time.time()
     graph = build_graph()
     result = graph.invoke({"question": query.question})
+    print(f"[DEBUG] /ask route finished in {time.time() - start:.2f}s")
     return result 
 
 
