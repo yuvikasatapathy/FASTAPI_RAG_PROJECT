@@ -20,11 +20,20 @@ if st.button("Submit"):
                     streamed_text += word + " "
                     st.success(streamed_text)
                     time.sleep(0.05)
-            st.write("**Top Chunks (from DB):**")
+            st.markdown("**Top Chunks (from DB):**")
+            seen_chunks = set()
             for chunk in result.get("top_chunks", []):
-                st.write(f"-{chunk}")
-                st.markdown("---")  # adds a line break to force visual separation
-                st.write(response.json())  # TEMP: debug raw output
+                if isinstance(chunk, list):
+                    for inner in chunk: 
+                        if inner not in seen_chunks:
+                            st.markdown(f"-{inner}")
+                            seen_chunks.add(inner)
+                else:
+                    if chunk not in seen_chunks:  
+                        st.markdown(f"-{chunk}")
+                        seen_chunks.add(chunk)
+                #st.markdown("---")  # adds a line break to force visual separation
+                
 
         else:
             st.error("Error: Could not get answer from API")

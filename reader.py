@@ -113,12 +113,21 @@ def search_pgvector(query_embedding, top_k=3):
         ORDER BY embedding <-> %s::vector
         LIMIT %s
         """,
-        (query_embedding, top_k)
+        (query_embedding, top_k * 2)
     )
     results = cur.fetchall()
     cur.close()
     conn.close()
-    return results 
+    seen = set()
+    unique_chunks = []
+    for row in results: 
+        text = row[0].strip()
+        if text not in seen:
+            seen.add(text)
+            unique_chunks.append(text)
+        if len(unique_chunks) == top_k:
+            break 
+    return results
 query_embedding = result['embedding'][0] 
 results = search_pgvector(query_embedding)#select one query embedding and store it in variable, will use this vector in sql query 
 print(results)
