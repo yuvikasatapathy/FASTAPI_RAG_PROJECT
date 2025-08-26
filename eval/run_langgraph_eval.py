@@ -41,7 +41,7 @@ STUDENT ANSWER: {outputs.get('answer','')}"""
     )
     return bool(grade["correct"])
 
-# (2) RELEVANCE: Response vs Input (question)
+# RELEVANCE: Response vs Input 
 
 class RelevanceGrade(TypedDict):
     explanation: Annotated[str, ..., "Explain your reasoning for the score"]
@@ -66,7 +66,7 @@ def relevance(inputs: dict, outputs: dict) -> bool:
     return bool(grade["relevant"])
 
 
-# (3) GROUNDEDNESS: Response vs Retrieved Docs
+#GROUNDEDNESS: Response vs Retrieved Docs
 
 class GroundedGrade(TypedDict):
     explanation: Annotated[str, ..., "Explain your reasoning for the score"]
@@ -94,7 +94,7 @@ def groundedness(inputs: dict, outputs: dict) -> bool:
     return bool(grade["grounded"])
 
 
-# (4) RETRIEVAL RELEVANCE: Retrieved Docs vs Input (question)
+# RETRIEVAL RELEVANCE: Retrieved Docs vs Input (question)
 
 class RetrievalRelevanceGrade(TypedDict):
     explanation: Annotated[str, ..., "Explain your reasoning for the score"]
@@ -124,10 +124,10 @@ def target(inputs: dict) -> dict:
     q = inputs["question"]
     result = runnable.invoke({"question": q})
 
-    # Map to evaluator-friendly keys:
+
     answer = result.get("answer", "")
 
-    # Accept several possible field names from your graph and normalize to 'documents'
+   
     docs = result.get("documents") or result.get("contexts") or result.get("chunks") or []
     if isinstance(docs, str):
         docs = [docs]
@@ -138,7 +138,7 @@ def target(inputs: dict) -> dict:
 
 experiment = client.evaluate(
     target,
-    data=DATASET_NAME,  # dataset you created from your JSONL (inputs: question, outputs: answer=gold)
+    data=DATASET_NAME,  
     evaluators=[correctness, relevance, groundedness, retrieval_relevance],
     experiment_prefix="rag-baseline-langgraph",
     metadata={"grader_model": GRADER_MODEL},
