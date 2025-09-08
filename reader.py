@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv 
 import google.generativeai as genai 
 import psycopg2
+from langsmith import traceable 
 
 reader = PdfReader("/Users/richa/Downloads/sample_medical_insurance.pdf")
 number_of_pages = len(reader.pages)
@@ -88,6 +89,7 @@ result = genai.embed_content(
     ],
     task_type = "retrieval_query",
 )
+@traceable(run_type="chain", name="embed_query")
 def embed_query(query):
     response = genai.embed_content(
         model="models/embedding-001",
@@ -97,6 +99,7 @@ def embed_query(query):
     return response["embedding"]
 
 print(result['embedding'])
+@traceable(run_type="tool", name="pgvector_search")
 def search_pgvector(query_embedding, top_k=3):
     conn=psycopg2.connect(
         database="postgres",

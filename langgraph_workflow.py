@@ -13,7 +13,7 @@ def retrieve_node(state):
 
 
 def prompt_node(state):
-    # You can optionally refine this prompt
+   
     chunks = state["chunks"]
     question = state["question"]
     context = "\n\n".join(chunks)

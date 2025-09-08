@@ -8,10 +8,14 @@ import google.generativeai as genai
 import shutil 
 from rag_langgraph import runnable 
 from langgraph_workflow import build_graph
+from langsmith import Client
+from langsmith.run_helpers import trace 
 
 app = FastAPI()
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+GRAPH = build_graph()
 
 def get_connection():
     return psycopg2.connect(
@@ -26,11 +30,21 @@ class Query(BaseModel):
 
 @app.post("/ask")
 def ask_question(query: Query):
-    start = time.time()
-    graph = build_graph()
-    result = graph.invoke({"question": query.question})
-    print(f"[DEBUG] /ask route finished in {time.time() - start:.2f}s")
-    return result 
+    with trace("RAG Ask") as run:
+        run.add_inputs({"question": query.question})
+        start = time.time()
+        result = GRAPH.invoke({"question": query.question})
+        answer = result.get("answer") or result.get("response") or ""
+
+        run.add_outputs({
+            "answer": answer, 
+            "top_chunks": result.get("top_chunks", [])
+        })
+        print(f"[DEBUG] /ask route finished in {time.time() - start:.2f}s")
+        return {
+            "answer": answer, 
+            "top_chunks": result.get("top_chunks", [])
+        }
 
 
 
@@ -47,6 +61,5 @@ async def upload_pdf(file: UploadFile = File(...)):
             "result": result
         }
     except Exception as e:
-        # Print the error in the console and raise an HTTP 500 for better debugging
-        print("❌ ERROR:", e)
+        print("ERROR:", e)
         raise HTTPException(status_code=500, detail=str(e))
